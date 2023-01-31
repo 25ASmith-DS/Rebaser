@@ -1,57 +1,123 @@
-
 public class Rebaser {
 
+
+    static final char[] digits = {
+        '0' , '1' , '2' , '3' , '4' , '5' ,
+        '6' , '7' , '8' , '9' , 'a' , 'b' ,
+        'c' , 'd' , 'e' , 'f'
+    };
+    
     private String v;
     
+    /**
+    * Initializes a Rebaser with the value "0"
+    */
     public Rebaser(){
         v = "0";
     }
 
     /***
-    * Initializes a Rebaser with a string representation of a number.
-    * If an invalid string is used (Above base 16) then the initialized value = "0".
-    * @param value
-    *: init value
+    * Initializes a Rebaser with a string representation of a number (initializes with "0" if value is invalid)
+    * @param value Init value
     ***/
     public Rebaser(String value) {
         if (Rebaser.isValidNumber(value, 16)) {
-            this.v = value;
+            this.v = value.toUpperCase();
         } else {
             this.v = "0";
         }
     }
 
+    /*** 
+    * Sets the stored value to "value" if "value" is a valid string representation of an integer
+    * @param value String representation of an integer of any base 2-16
+    **/
     public void setValue(String value) {
-        if (Rebaser.isValidNumber(value, 16)) {
-            this.v = value;
+        if (isValidNumber(value, 16)) {
+            this.v = value.toUpperCase();
         } else {
             this.v = "0";
         }
     }
 
+    /**
+    * Returns the stored value
+    * @return Stored value
+    */
     public String getValue() {
-        return this.v;   
+        return this.v;
     }
 
+    /**
+    * Returns the stored number converted from base 10 to a different base
+    * @param toBase The base to convert to
+    * @return The converted number
+    */
     public String convertToBaseN(int toBase) {
-        // TODO: make this
-        return "TODO";
-    }
+        int num = Integer.parseInt(this.v);
 
-    public String convertToBase10(int fromBase) {
-        int result = 0;
-        int digits = this.v.length();
-        for (int digit = digits - 1, placeValue = 0; digit >= 0; digit--, placeValue++) {
-            result += digitToBaseN(this.v.charAt(digit)) * (int)Math.pow(fromBase, placeValue);
+        if (toBase < 2 || toBase > 16 ) {
+            return  "-1";
         }
-        return Integer.toString(result);
+        if ( num < 0 ) {
+            return  "-1";
+        }
+
+        int tmp = num;
+        int n;
+        String str = "";
+
+        while (true) {
+            n = tmp % toBase;
+            tmp = tmp / toBase;
+
+            if ( tmp <= 0 ) {
+                str += digits[n];
+                break;
+            } else {
+                str += digits[n];
+            }
+        }
         
+        String str1 = "";
+        int len = str.length();
+        for (int i = 0; i < len; i++) {
+            str1 += str.charAt(len-i-1);
+        }
+        return str1;
     }
 
+    /**
+    * Converts the stored value from a specified base into base 10
+    * @param fromBase The base of the stored string
+    * @return Stored value converted to base 10
+    */
+    public String convertToBase10(int fromBase) {
+        if ( fromBase < 2 || fromBase > 16 ) {
+            return "-1";
+        }
+        if (!isValidNumber(v, fromBase)) {
+            return "-1";
+        }
+        
+        int result = 0;
+        int len = this.v.length();
+        int digitValue;
+        int placeValue;
+        int place = 0;
+        
+        for (int digit = len - 1; digit >= 0; digit--) {            
+            digitValue = digitToBaseN(this.v.charAt(digit));            
+            placeValue = (int)Math.pow(fromBase, place);
+            
+            result += digitValue * placeValue;
+            place++;
+        }        
+        return Integer.toString(result);
+    }
 
-    /*** private methods &#11088 ***/
+    /*** private methods ***/
 
-    // convert digit to integer value
     private static int digitToBaseN(char digit) {
         switch (digit) {
             case '0': return 0;
@@ -83,7 +149,11 @@ public class Rebaser {
 
     private static boolean isValidNumber(String number, int base) {
         // guard statement: string isn't empty
-        if (number.isEmpty()) {
+        if (number.isEmpty() || number == null) {
+            return false;
+        }
+        // guard statement: base is valid
+        if (2 > base || 16 < base) {
             return false;
         }
 

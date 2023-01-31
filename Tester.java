@@ -5,8 +5,10 @@ public class Tester {
         Random random = new Random();
         Rebaser rebaser = new Rebaser();
         int testCount = 50;
+
         boolean[] testResults;
         String[][] testDetails;
+        // [ [ expected result, actual result ] ... ]
         
         String toConvert;
         String actual;
